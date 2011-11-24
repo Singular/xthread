@@ -13,6 +13,9 @@ struct ThreadInfo {
 
 #include "tlsize.cc"
 
+#define TL (Thread::currentMemory())
+#define TI (Thread::current()->info())
+
 ConditionVariable *cond;
 Lock *lock;
 
@@ -20,10 +23,10 @@ class ThreadBody : public ThreadAction {
 public:
   virtual void main(Thread *self) {
     unsigned long i;
-    unsigned long arg = self->info().arg;
+    unsigned long arg = TI.arg;
     for (i=0; i<arg; i++)
-      self->memory().counter++;
-    self->info().result = self->memory().counter;
+      TL.counter++;
+    TI.result = TL.counter;
     lock->lock(); cond->signal(); lock->unlock();
   }
 };
