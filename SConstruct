@@ -18,3 +18,4 @@ Threads.Append(LIBS=libs)
 
 Threads.Library(["xthread"], ["thread.cc"])
 Program("example.cc")
+Program("example2.cc")
