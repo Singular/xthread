@@ -31,6 +31,7 @@ public:
 int main() {
   Thread *t1, *t2;
   ThreadBody body;
+  ThreadInitMainStack();
   lock[0] = new Lock();
   lock[1] = new Lock();
   cond[0] = new ConditionVariable(lock[0]);

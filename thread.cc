@@ -45,6 +45,14 @@ Thread::Thread() {
   memset(&memory(), 0, threadLocalDataSize());
 }
 
+void Thread::Thread0() {
+  thread_num = 0;
+  descriptor = pthread_self();
+  memset(&info(), 0, threadInfoSize());
+  memset(&memory(), 0, threadLocalDataSize());
+}
+
+
 Thread::~Thread() {
   threadManagerLock.lock();
   threadIDs.push_back(thread_num);
@@ -111,6 +119,19 @@ void Thread::wait() {
   if (!thread_num)
     ThreadError("cannot wait for main thread");
   pthread_join(descriptor, NULL);
+}
+
+void ThreadGrowMainStack() {
+  char *tls = reinterpret_cast<char *>(Thread::current());
+  size_t pagesize = getpagesize();
+  char *p = CHARP(alloca(pagesize/2));
+  // alloca() may allocate more bytes than requested, so
+  // we proceed in steps smaller than the actual page size.
+  while (p > tls) {
+    *p = '\0'; /* touch page */
+    p = CHARP(alloca(pagesize/2));
+  }
+  Thread::current()->Thread0();
 }
 
 void Semaphore::wait() {

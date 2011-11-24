@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <alloca.h>
 #include <cstddef>
 #include <exception>
 
@@ -15,6 +16,13 @@
 
 #define STACK_AREA_SIZE (1<<LOG2_STACK_AREA_SIZE)
 #define STACK_AREA_MASK ~(STACK_AREA_SIZE-1)
+
+#define ThreadInitMainStack() \
+  do { \
+    int dummy[0]; \
+    alloca(((uintptr_t) dummy) & ~STACK_AREA_MASK); \
+    ThreadGrowMainStack(); \
+  } while (0)
 
 struct ThreadLocalData;
 struct ThreadInfo;
@@ -48,6 +56,7 @@ private:
   ThreadID thread_num;
 public:
   Thread();
+  void Thread0(); // pseudo constructor for main thread
   ~Thread();
   ThreadID id() { return thread_num; }
   void* operator new(std::size_t size);
@@ -86,6 +95,8 @@ class ThreadAction {
 public:
   virtual void main(Thread *thread) = 0;
 };
+
+void ThreadGrowMainStack();
 
 class ConditionVariable;
 

@@ -30,6 +30,7 @@ public:
 int main() {
   Thread *t1, *t2;
   ThreadBody body;
+  ThreadInitMainStack();
   t1 = new Thread();
   t2 = new Thread();
   t1->info().arg =
