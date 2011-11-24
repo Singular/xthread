@@ -1,7 +1,7 @@
 #include <list>
 #include <vector>
 
-#include <stdint.h>
+#include <cstring>
 #include <sys/mman.h>
 
 #include "thread.h"
