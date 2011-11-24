@@ -22,6 +22,9 @@ struct ThreadInfo;
 std::size_t threadLocalDataSize();
 std::size_t threadInfoSize();
 
+extern std::size_t threadLocalDataSize_;
+extern std::size_t threadInfoSize_;
+
 class ThreadAction;
 typedef long ThreadID;
 
@@ -71,7 +74,7 @@ public:
   ThreadInfo& info() {
     char *base = reinterpret_cast<char *>(this);
     return *reinterpret_cast<ThreadInfo*>(
-      base + sizeof(Thread) + threadLocalDataSize()
+      base + sizeof(Thread) + threadLocalDataSize_
     );
   }
   static ThreadLocalData& currentMemory() {

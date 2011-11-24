@@ -13,6 +13,9 @@ static Lock threadManagerLock;
 static list<ThreadID> threadIDs;
 static ThreadID maxThreadID;
 
+size_t threadLocalDataSize_ = threadLocalDataSize();
+size_t threadInfoSize_ = threadInfoSize();
+
 class BasicThreadAction : public ThreadAction {
 private:
   void (*body)(Thread *);
