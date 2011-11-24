@@ -30,13 +30,18 @@ public:
 int main() {
   Thread *t1, *t2;
   ThreadBody body;
-  ThreadInitMainStack();
-  t1 = new Thread();
-  t2 = new Thread();
+  ThreadInitMainStack(); // Initialize main thread's thread-local memory.
+                         // This has to be done in the main function;
+			 // ThreadInitMainStack() is a macro that uses
+			 // alloca() to move the stack pointer and will
+			 // not work once you return from a function that
+			 // calls it.
+  t1 = new Thread(); // Create two new threads
+  t2 = new Thread(); // Creating threads does not start them
   t1->info().arg =
-  t2->info().arg = 100000000;
-  t1->run(body); t2->run(body);
-  t1->wait();    t2->wait();
+  t2->info().arg = 100000000; // Pass arguments to both
+  t1->run(body); t2->run(body); // Actually run them
+  t1->wait();    t2->wait(); // Wait for both to complete
   std::cout << "Result: " << t1->info().result + t2->info().result << "\n";
-  delete t1; delete t2;
+  delete t1; delete t2; // reclaim thread memory
 }
