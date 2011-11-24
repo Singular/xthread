@@ -2,6 +2,7 @@
 #include <vector>
 
 #include <cstring>
+#include <unistd.h>
 #include <sys/mman.h>
 
 #include "thread.h"
