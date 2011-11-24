@@ -127,7 +127,11 @@ void ThreadGrowMainStack() {
   char *p = CHARP(alloca(pagesize/2));
   // alloca() may allocate more bytes than requested, so
   // we proceed in steps smaller than the actual page size.
+#ifdef STACK_GROWS_UP
+  while (p < tls) {
+#else
   while (p > tls) {
+#endif
     *p = '\0'; /* touch page */
     p = CHARP(alloca(pagesize/2));
   }

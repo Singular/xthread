@@ -17,12 +17,21 @@
 #define STACK_AREA_SIZE (1<<LOG2_STACK_AREA_SIZE)
 #define STACK_AREA_MASK ~(STACK_AREA_SIZE-1)
 
+#ifdef STACK_GROWS_UP
+#define ThreadInitMainStack() \
+  do { \
+    int dummy[0]; \
+    alloca(STACK_AREA_SIZE-(((uintptr_t) dummy) & ~STACK_AREA_MASK)); \
+    ThreadGrowMainStack(); \
+  } while (0)
+#else
 #define ThreadInitMainStack() \
   do { \
     int dummy[0]; \
     alloca(((uintptr_t) dummy) & ~STACK_AREA_MASK); \
     ThreadGrowMainStack(); \
   } while (0)
+#endif
 
 struct ThreadLocalData;
 struct ThreadInfo;
