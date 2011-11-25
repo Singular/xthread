@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <exception>
 
-#if SIZE_T_MAX == 4
+#if LONG_BIT == 32
 #define LOG2_STACK_AREA_SIZE 18
 #else
 #define LOG2_STACK_AREA_SIZE 20
