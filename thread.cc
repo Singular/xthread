@@ -116,7 +116,8 @@ void Thread::run(ThreadAction &body) {
   // pthread_attr_setstack() call requires a pointer to the
   // start of it.
   pthread_attr_setstack(&attr, stack_bottom, stack_size);
-  pthread_create(&descriptor, &attr, dispatchThread, &body);
+  if (pthread_create(&descriptor, &attr, dispatchThread, &body) < 0)
+    ThreadError("could not start thread");
 }
 
 void Thread::run(void (*body)(Thread *)) {
@@ -140,6 +141,7 @@ void ThreadGrowMainStack() {
   // alloca() may allocate more bytes than requested, so
   // we proceed in steps smaller than the actual page size.
 #ifdef STACK_GROWS_UP
+  tls += STACK_AREA_SIZE;
   while (p < tls) {
 #else
   while (p > tls) {

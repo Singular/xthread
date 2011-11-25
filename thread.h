@@ -81,7 +81,7 @@ public:
     int dummy[0];
     stack = dummy;
 #endif
-    return (Thread *)(((uintptr_t) stack) & STACK_AREA_MASK);
+    return reinterpret_cast<Thread *>(((uintptr_t) stack) & STACK_AREA_MASK);
   }
   ThreadLocalData& memory() {
     char *base = reinterpret_cast<char *>(this);
