@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "thread.h"
+#include "xthread.h"
 
 using namespace std;
 

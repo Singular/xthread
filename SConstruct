@@ -1,5 +1,5 @@
 libs = [ "xthread" ]
-cflags = "-g -O2"
+cflags = "-g -O0"
 linkflags = "-g"
 
 Threads=DefaultEnvironment()
@@ -11,11 +11,11 @@ Threads.Append(LINKFLAGS=linkflags)
 conf = Configure(Threads)
 if conf.CheckLib("pthread"):
   libs.append("pthread")
-if conf.CheckLib("rt"):
-  libs.append("rt")
+# if conf.CheckLib("rt"):
+#   libs.append("rt")
 
 Threads.Append(LIBS=libs)
 
-Threads.Library(["xthread"], ["thread.cc"])
+Threads.Library(["xthread"], ["xthread.cc"])
 Program("example.cc")
 Program("example2.cc")

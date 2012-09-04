@@ -1,6 +1,6 @@
 #include "cstddef"
 #include "iostream"
-#include "thread.h"
+#include "xthread.h"
 #include "unistd.h"
 
 struct ThreadLocalData {
@@ -11,7 +11,7 @@ struct ThreadInfo {
   unsigned arg;
 };
 
-#include "tlsize.cc"
+#include "tlsize.inc"
 
 #define TL (Thread::currentMemory())
 #define TI (Thread::current()->info())
@@ -32,6 +32,8 @@ public:
 };
 
 int main() {
+  try 
+  {
   Thread *t1, *t2;
   ThreadBody body;
   ThreadInitMainStack();
@@ -57,5 +59,11 @@ int main() {
     lock[1]->unlock();
     delete t1; delete t2;
     std::cout << "Done.\n";
+  }
+  }
+  catch( const std::exception & ex ) 
+  {
+    std::cerr << "There was an exception: " << ex.what() << std::endl;
+    throw;
   }
 }

@@ -1,0 +1,17 @@
+TODOS:
+
+. fail if necessary stuff was not found
+
+. check for __builtin_frame_address, alloca
+
+
+FIX:
+
+AX_CHECK_FUNC_IN produces wrong configure output
+
+. check for __builtin_frame_address, alloca
+
+
+OPTIMIZATIONS: 
+
+make use of posix_memalign if available 

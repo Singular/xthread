@@ -1,6 +1,8 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
+#include "xthread_config.h"
+
 #include <limits.h>
 #include <pthread.h>
 #include <stdint.h>
@@ -20,14 +22,14 @@
 #ifdef STACK_GROWS_UP
 #define ThreadInitMainStack() \
   do { \
-    int dummy[0]; \
+    int dummy[1]; \
     alloca(STACK_AREA_SIZE-(((uintptr_t) dummy) & ~STACK_AREA_MASK)); \
     ThreadGrowMainStack(); \
   } while (0)
 #else
 #define ThreadInitMainStack() \
   do { \
-    int dummy[0]; \
+    int dummy[1]; \
     alloca(((uintptr_t) dummy) & ~STACK_AREA_MASK); \
     ThreadGrowMainStack(); \
   } while (0)
@@ -67,35 +69,34 @@ public:
   Thread();
   void Thread0(); // pseudo constructor for main thread
   ~Thread();
-  ThreadID id() { return thread_num; }
+  FORCE_INLINE ThreadID id() { return thread_num; }
   void* operator new(std::size_t size);
   void operator delete(void *memory);
   void run(ThreadAction& body);
   void run(void (*body)(Thread *));
   void wait();
-  static Thread* current() {
+  static FORCE_INLINE Thread* current() {
     void *stack;
 #ifdef __GNUC__
     stack = __builtin_frame_address(0);
 #else
-    int dummy[0];
-    stack = dummy;
+    { int dummy[1]; stack = dummy; }
 #endif
     return reinterpret_cast<Thread *>(((uintptr_t) stack) & STACK_AREA_MASK);
   }
-  ThreadLocalData& memory() {
+  FORCE_INLINE ThreadLocalData& memory() {
     char *base = reinterpret_cast<char *>(this);
     return *reinterpret_cast<ThreadLocalData*>(
       base + sizeof(Thread)
     );
   }
-  ThreadInfo& info() {
+  FORCE_INLINE ThreadInfo& info() {
     char *base = reinterpret_cast<char *>(this);
     return *reinterpret_cast<ThreadInfo*>(
       base + sizeof(Thread) + threadLocalDataSize_
     );
   }
-  static ThreadLocalData& currentMemory() {
+  static FORCE_INLINE ThreadLocalData& currentMemory() {
     return current()->memory();
   }
 };
@@ -138,8 +139,9 @@ public:
   }
   void unlock() {
 #ifdef DEBUG_THREADS
-    if (owner != Thread::current());
+    if (owner != Thread::current())
       ThreadError("unlocking unowned lock");
+    owner = NULL;
 #endif
     pthread_mutex_unlock(&mutex);
   }
@@ -184,8 +186,12 @@ public:
 #ifdef DEBUG_THREADS
     if (lock->owner != Thread::current())
       ThreadError("waited on condition without locked mutex");
+    lock->owner = NULL;
 #endif
     pthread_cond_wait(&condition, &lock->mutex);
+#ifdef DEBUG_THREADS
+    lock->owner = Thread::current();
+#endif
   }
   void signal() {
 #ifdef DEBUG_THREADS
